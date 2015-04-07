@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<title>CAP 6721 Joseph Sarabia</title>
+		<script type="text/javascript" src="hw1.js"></script>
+ 
+	</head>
+	<body onLoad="main()">
+		<script id="mandelbrot" type="text/x-opencl">
+
+			__kernel void mandelbrot(__global uchar4* pixels, uint cols, uint rows) {
+				unsigned int col = get_global_id(0);
+				unsigned int row = get_global_id(1);
+
+				/*
+					centers the image, subtracting different values will shift it
+					while changing the denominator will zoom in and out
+				*/
+				float y = ((float)row - 256.0) / 256.0;
+				float x = ((float)col -384.0) / 256.0;
+
+				if(col >= cols || row >= rows) return;
+				float2 z = (float2)(x, y);
+				float2 c = (float2)(z.x,z.y);
+				uchar4 color = (uchar4)(0, 0, 0,255);
+				pixels[row*cols+col] = color;
+				for(float i = 0; i< 1000.0; i+= 1.0){
+					z = (float2)(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
+					if(dot(z,z) > 4.0){
+						color = (uchar4)((float)((uint)i%255), (float)( ((uint)(i*4.0))%255), (float)( ((uint)(i*8.0))%255),255);
+						pixels[row*cols+col] = color;
+					}
+				}
+			}
+		</script>  
+		<div id="container" style = "width:1400px">
+			<div id="title" style ="background-color:#FFFFFF;height:75px;width:1300px;text-align:left;">
+				<h1>Joseph Sarabia Homework 1</h1>
+			</div>
+			<div id="window" style ="background-color:#FFFFFF;height:800px;width:850px;float:left;">
+				<canvas id="canvas" width="512px" height="512px" style="border:5px solid #000000; background: blue"></canvas><br>
+			</div>		
+			<div id="options" style="background-color:#FFFFFF;height:700px;width:515px;float:left;">			 
+			</div>
+		</div>
+	</body>
+</html>
